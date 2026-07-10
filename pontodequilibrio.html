@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Calculadora Inteligente de Ponto de Equilíbrio Empresarial | Osmair Junior</title>
+<meta name="description" content="Descubra em 3 minutos quanto sua empresa precisa faturar para parar de trabalhar apenas para pagar contas. Calculadora gratuita de ponto de equilíbrio, margem de contribuição e diagnóstico financeiro.">
+<meta property="og:title" content="Calculadora Inteligente de Ponto de Equilíbrio Empresarial">
+<meta property="og:description" content="Descubra quanto sua empresa precisa faturar para parar de trabalhar apenas para pagar contas.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F3F7F6;
+    --surface:#FFFFFF;
+    --navy:#0B2545;
+    --navy-soft:#3C5470;
+    --navy-wash:#E9ECF3;
+    --teal:#12796A;
+    --teal-light:#17916F;
+    --teal-wash:#E4F1EC;
+    --blue:#2C6E9E;
+    --blue-wash:#E7F0F7;
+    --amber:#B4791F;
+    --amber-wash:#FBF1E1;
+    --red:#C0453A;
+    --red-wash:#FBEAE8;
+    --text-muted:#5B6B72;
+    --border:#E2E8E6;
+    --shadow: 0 1px 2px rgba(11,37,69,0.04), 0 8px 24px -12px rgba(11,37,69,0.12);
+  }
+  [data-theme="dark"]{
+    --bg:#0B1620;
+    --surface:#132131;
+    --navy:#F2F6F8;
+    --navy-soft:#B9C6D0;
+    --navy-wash:#1C2E40;
+    --teal:#2FBF9F;
+    --teal-light:#38D6B2;
+    --teal-wash:#123B33;
+    --blue:#6FB0E0;
+    --blue-wash:#132C3D;
+    --amber:#E0A94E;
+    --amber-wash:#3A2C13;
+    --red:#E8756A;
+    --red-wash:#3A1917;
+    --text-muted:#8FA0AC;
+    --border:#26394A;
+    --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--navy); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; transition: background 0.25s ease, color 0.25s ease; }
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(18,121,106,0.08), transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(11,37,69,0.06), transparent 45%),
+      var(--bg);
+  }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+
+  .app{ width:100%; max-width:640px; min-height:100vh; margin:0 auto; background:var(--surface); display:flex; flex-direction:column; position:relative; }
+  @media (min-width:720px){
+    body{ padding:40px 20px; }
+    .app{ min-height:auto; border-radius:26px; box-shadow: 0 24px 70px -20px rgba(11,37,69,0.28), 0 4px 16px rgba(11,37,69,0.08); overflow:hidden; }
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{ display:flex; align-items:center; gap:14px; padding:18px 22px 10px; position:sticky; top:0; background:var(--surface); z-index:5; }
+  .back-btn, .theme-btn{ background:none; border:none; padding:6px; margin:-6px; cursor:pointer; color:var(--navy-soft); display:flex; border-radius:8px; transition: background 0.15s ease; flex:0 0 auto; }
+  .back-btn:hover, .theme-btn:hover{ background:var(--bg); }
+  .back-btn svg, .theme-btn svg{ width:20px; height:20px; }
+  .back-btn.hidden{ visibility:hidden; }
+  .segments{ flex:1; display:flex; gap:5px; }
+  .segment{ flex:1; height:6px; background:var(--bg); border-radius:100px; overflow:hidden; }
+  .segment-fill{ height:100%; width:0%; border-radius:100px; transition: width 0.4s ease; background:linear-gradient(90deg, var(--navy), var(--teal)); }
+  .step-label{ padding:0 22px 14px; font-size:12px; color:var(--text-muted); font-weight:600; }
+
+  .screen-wrap{ flex:1; display:flex; flex-direction:column; padding:8px 24px 34px; }
+  .screen{ display:flex; flex-direction:column; flex:1; animation: slideIn 0.35s ease-out; }
+  @keyframes slideIn{ from{ opacity:0; transform:translateX(14px); } to{ opacity:1; transform:translateX(0); } }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+
+  .eyebrow{ font-size:12.5px; font-weight:700; color:var(--teal); letter-spacing:0.3px; margin-bottom:8px; text-transform:uppercase; }
+  h1.step-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:21px; line-height:1.32; margin:0 0 6px; letter-spacing:-0.2px; }
+  p.step-sub{ font-size:13.5px; color:var(--text-muted); line-height:1.55; margin:0 0 22px; }
+
+  /* ---------- Fields ---------- */
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:13px; font-weight:600; color:var(--navy-soft); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; padding:14px 15px; border:1.5px solid var(--border); border-radius:12px;
+    font-family:'Inter',sans-serif; font-size:15px; color:var(--navy); background:var(--bg);
+    transition: border-color 0.15s ease; appearance:none;
+  }
+  .field select{
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%235B6B72" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>');
+    background-repeat:no-repeat; background-position:right 14px center; background-size:16px;
+  }
+  .field input:focus, .field select:focus{ outline:none; border-color:var(--teal); background:var(--surface); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field-note{ font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+  .toggle-row{ display:flex; gap:10px; margin-bottom:18px; }
+  .toggle-opt{ flex:1; padding:12px; text-align:center; border:1.5px solid var(--border); border-radius:12px; background:var(--surface); cursor:pointer; font-weight:600; font-size:13.5px; color:var(--navy-soft); transition: all 0.15s ease; }
+  .toggle-opt.active{ border-color:var(--teal); background:var(--teal-wash); color:var(--teal); }
+
+  /* ---------- Custos fixos list ---------- */
+  .cost-row{ display:flex; gap:10px; align-items:center; margin-bottom:10px; animation: fadeUp 0.25s ease-out; }
+  .cost-row select{ flex:1.3; padding:12px 13px; border:1.5px solid var(--border); border-radius:11px; background:var(--bg); font-size:13.5px; color:var(--navy); }
+  .cost-row input{ flex:1; padding:12px 13px; border:1.5px solid var(--border); border-radius:11px; background:var(--bg); font-size:13.5px; color:var(--navy); }
+  .cost-row .rm-btn{ flex:0 0 auto; width:34px; height:34px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface); color:var(--red); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .cost-row .rm-btn svg{ width:15px; height:15px; }
+  .add-cost-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px;
+    border:1.5px dashed var(--border); border-radius:12px; background:none; color:var(--teal);
+    font-weight:600; font-size:14px; cursor:pointer; margin:6px 0 18px; transition: background 0.15s ease;
+  }
+  .add-cost-btn:hover{ background:var(--teal-wash); }
+  .add-cost-btn svg{ width:16px; height:16px; }
+  .cost-total{ display:flex; justify-content:space-between; align-items:center; padding:16px 18px; background:var(--navy-wash); border-radius:14px; margin-top:4px; }
+  .cost-total .label{ font-size:13px; font-weight:600; color:var(--navy-soft); }
+  .cost-total .value{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; }
+
+  /* ---------- Memória de cálculo ---------- */
+  .memo-box{ background:var(--bg); border:1px dashed var(--border); border-radius:12px; padding:14px 16px; margin-top:6px; }
+  .memo-box .memo-title{ font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; }
+  .memo-line{ display:flex; justify-content:space-between; font-size:13px; color:var(--navy-soft); padding:3px 0; }
+  .memo-line.total{ border-top:1px solid var(--border); margin-top:6px; padding-top:8px; font-weight:700; color:var(--navy); }
+
+  /* ---------- Buttons ---------- */
+  .primary-btn{
+    width:100%; padding:16px; border:none; border-radius:14px;
+    background:linear-gradient(155deg, var(--navy) 0%, var(--teal) 130%);
+    color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15.5px;
+    cursor:pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: var(--shadow);
+  }
+  [data-theme="dark"] .primary-btn{ color:#0B1620; }
+  .primary-btn:hover{ transform:translateY(-2px); }
+  .primary-btn:active{ transform:translateY(0) scale(0.98); }
+  .primary-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  .secondary-btn{
+    width:100%; padding:14px; border:1.5px solid var(--border); border-radius:14px; background:none;
+    color:var(--navy-soft); font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:10px;
+  }
+  .secondary-btn:hover{ border-color:var(--teal); color:var(--teal); }
+  .ghost-link{ background:none; border:none; color:var(--text-muted); font-size:13px; text-decoration:underline; cursor:pointer; margin:16px auto 0; display:block; }
+
+  /* ---------- Intro ---------- */
+  .intro-screen{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:18px 0; }
+  .intro-badge{ align-self:flex-start; font-size:12.5px; font-weight:600; color:var(--teal); background:var(--teal-wash); padding:5px 12px; border-radius:100px; margin-bottom:16px; }
+  .intro-screen h1{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:27px; line-height:1.26; margin:0 0 12px; letter-spacing:-0.3px; }
+  .intro-screen > p{ font-size:14.5px; color:var(--text-muted); line-height:1.6; margin:0 0 22px; }
+  .intro-list{ list-style:none; padding:0; margin:0 0 28px; display:flex; flex-direction:column; gap:10px; }
+  .intro-list li{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; font-weight:500; color:var(--navy); }
+  .intro-list li svg{ flex:0 0 auto; width:18px; height:18px; color:var(--teal); margin-top:1px; }
+  .intro-meta{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-muted); margin-bottom:22px; }
+
+  /* ---------- Loading ---------- */
+  .loading-screen{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; }
+  .spinner{ width:52px; height:52px; border-radius:50%; border:4px solid var(--border); border-top-color:var(--teal); animation: spin 0.9s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loading-text{ font-size:14px; color:var(--text-muted); font-weight:500; }
+
+  /* ---------- Results ---------- */
+  .kpi-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:8px 0 20px; }
+  .kpi-card{ background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:16px 16px; box-shadow: var(--shadow); }
+  .kpi-card .k-label{ font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.2px; margin-bottom:6px; }
+  .kpi-card .k-value{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; letter-spacing:-0.3px; }
+  .kpi-card.wide{ grid-column:1 / -1; }
+
+  .gauge-row{ display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; justify-content:center; }
+  .gauge-block{ display:flex; flex-direction:column; align-items:center; text-align:center; flex:1; min-width:150px; }
+  .gauge-block .g-title{ font-size:12.5px; font-weight:600; color:var(--navy-soft); margin-top:6px; }
+  .gauge-block .g-value{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; margin-top:2px; }
+
+  .diagnosis-box{ background:var(--teal-wash); border-radius:16px; padding:20px 20px; margin:6px 0 22px; }
+  .diagnosis-box .d-title{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--teal); text-transform:uppercase; margin-bottom:10px; }
+  .diagnosis-box .d-title svg{ width:15px; height:15px; }
+  .diagnosis-box p{ margin:0; font-size:14.5px; line-height:1.6; color:var(--navy); }
+
+  .check-list{ list-style:none; padding:0; margin:0 0 22px; display:flex; flex-direction:column; gap:10px; }
+  .check-list li{ display:flex; gap:10px; align-items:flex-start; padding:13px 15px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; color:var(--navy); }
+  .check-list li svg{ flex:0 0 auto; width:17px; height:17px; color:var(--teal); margin-top:1px; }
+
+  /* ---------- Conversão ---------- */
+  .conv-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; text-align:center; margin:4px 0 10px; }
+  .conv-text{ font-size:14px; color:var(--text-muted); text-align:center; line-height:1.6; margin:0 0 24px; }
+  .compare-grid{ display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
+  @media (min-width:520px){ .compare-grid{ flex-direction:row; } }
+  .compare-card{ flex:1; border-radius:16px; padding:20px 20px; border:1.5px solid var(--border); background:var(--surface); }
+  .compare-card.highlight{ border-color:var(--teal); background:var(--teal-wash); position:relative; }
+  .compare-card .c-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14.5px; margin-bottom:12px; letter-spacing:0.2px; }
+  .compare-card ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+  .compare-card li{ display:flex; gap:8px; font-size:13px; color:var(--navy-soft); align-items:flex-start; }
+  .compare-card li svg{ flex:0 0 auto; width:14px; height:14px; color:var(--teal); margin-top:2px; }
+
+  .offer-badge{ display:inline-block; font-size:11px; font-weight:700; background:var(--red); color:#fff; padding:4px 10px; border-radius:100px; margin-bottom:10px; }
+  .price-box{ background:linear-gradient(155deg, var(--navy) 0%, var(--teal) 130%); border-radius:18px; padding:24px 22px; text-align:center; color:#fff; margin-bottom:14px; }
+  .price-old{ font-size:14px; text-decoration:line-through; opacity:0.65; margin-bottom:2px; }
+  .price-new{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:34px; letter-spacing:-0.5px; }
+  .price-note{ font-size:12.5px; opacity:0.85; margin-top:8px; }
+
+  .security-list{ list-style:none; padding:0; margin:16px 0 0; display:flex; flex-wrap:wrap; gap:10px 18px; justify-content:center; }
+  .security-list li{ display:flex; gap:6px; align-items:center; font-size:12px; color:var(--text-muted); }
+  .security-list li svg{ width:13px; height:13px; color:var(--teal); }
+
+  .footer-note{ text-align:center; font-size:11.5px; color:#9AA6AA; margin-top:22px; }
+
+  /* checkbox */
+  .checkbox-row{ display:flex; gap:10px; align-items:flex-start; margin:6px 0 18px; }
+  .checkbox-row input{ margin-top:3px; width:16px; height:16px; accent-color:var(--teal); flex:0 0 auto; }
+  .checkbox-row label{ font-size:12.5px; color:var(--text-muted); line-height:1.5; }
+
+  @media (max-width:360px){
+    h1.step-title{ font-size:19px; }
+    .screen-wrap{ padding:8px 18px 28px; }
+    .field-row{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ============ ICONS ============ */
+const ICONS = {
+  back: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+  moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`,
+  spark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg>`,
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`,
+  bolt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>`
+};
+
+/* ============ CONSTANTES ============ */
+const WHATSAPP_NUMBER = "5547996242669";
+const HOTMART_LINK = "https://pay.hotmart.com/S106642023U?off=cvottyu2";
+const GOOGLE_SHEETS_URL = ""; // cole aqui a URL do seu Web App (mesmo passo a passo já usado no diagnóstico)
+
+const COST_CATEGORIES = ["Aluguel","Salários","Pró-labore","Energia","Internet","Marketing","Softwares","Contabilidade","Veículos","Seguros","Outros"];
+const SEGMENTOS = ["Comércio","Indústria","Serviços","E-commerce","Clínica / Saúde","Restaurante / Alimentação","Educação","Outro"];
+const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const FAIXAS_FATURAMENTO = ["Até R$15 mil/mês","R$15 a 30 mil/mês","R$30 a R$100 mil/mês","R$100 a R$300 mil/mês","Acima de R$300 mil/mês"];
+const ANOS_EMPRESA = ["Menos de 1 ano","1 a 3 anos","3 a 10 anos","Mais de 10 anos"];
+
+function sendLeadToSheet(payload){
+  if(!GOOGLE_SHEETS_URL) return;
+  fetch(GOOGLE_SHEETS_URL, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain" }, body: JSON.stringify(payload) })
+    .catch(() => {});
+}
+
+/* ============ STATE ============ */
+const STORAGE_KEY = "pontoequilibrio_state_v1";
+let state = {
+  screen: "intro",
+  history: [],
+  empresa: { nome:"", segmento:"", cidade:"", estado:"", anos:"", funcionarios:"", faixa:"" },
+  custos: [ { categoria:"Aluguel", valor:"" }, { categoria:"Salários", valor:"" } ],
+  margem: { modo:"informar", percentual:"", precoMedio:"", custosVariaveis:"", impostos:"", comissoes:"", fretes:"", taxas:"" },
+  extras: { ticketMedio:"", diasTrabalhados:"26", faturamentoMensal:"", faturamentoDiario:"" },
+  lead: { nome:"", email:"", whatsapp:"", cidade:"", estado:"", lgpd:false }
+};
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      state = { ...state, ...saved, screen:"intro", history:[] };
+    }
+  }catch(e){}
+}
+function initTheme(){
+  const saved = localStorage.getItem("pontoequilibrio_theme");
+  const theme = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("pontoequilibrio_theme", next);
+  render();
+}
+
+/* ============ NAVIGATION ============ */
+const STEP_ORDER = ["empresa","custos","margem","extras"];
+function goTo(id, { pushHistory = true } = {}){
+  if(pushHistory) state.history.push(state.screen);
+  state.screen = id;
+  saveState();
+  render();
+}
+function goBack(){
+  if(state.history.length === 0) return;
+  state.screen = state.history.pop();
+  render();
+}
+
+/* ============ HELPERS ============ */
+function toNumber(v){ const n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? 0 : n; }
+function fmtBRL(n){ return (n||0).toLocaleString("pt-BR", { style:"currency", currency:"BRL" }); }
+function fmtNum(n, dec=0){ return (n||0).toLocaleString("pt-BR", { minimumFractionDigits:dec, maximumFractionDigits:dec }); }
+
+/* ============ CÁLCULOS ============ */
+function computeAll(){
+  const custosFixosTotal = state.custos.reduce((s,c) => s + toNumber(c.valor), 0);
+
+  let margemPercent = 0, memo = null;
+  if(state.margem.modo === "informar"){
+    margemPercent = toNumber(state.margem.percentual);
+  } else {
+    const preco = toNumber(state.margem.precoMedio);
+    const cv = toNumber(state.margem.custosVariaveis);
+    const impostos = toNumber(state.margem.impostos);
+    const comissoes = toNumber(state.margem.comissoes);
+    const fretes = toNumber(state.margem.fretes);
+    const taxas = toNumber(state.margem.taxas);
+    const percentualSum = impostos + comissoes + taxas;
+    const variavelPercReais = preco * (percentualSum/100);
+    const variavelFixaReais = cv + fretes;
+    const custoVariavelUnidade = variavelFixaReais + variavelPercReais;
+    const margemReais = preco - custoVariavelUnidade;
+    margemPercent = preco > 0 ? (margemReais/preco)*100 : 0;
+    memo = { preco, cv, fretes, percentualSum, variavelPercReais, variavelFixaReais, custoVariavelUnidade, margemReais, margemPercent };
+  }
+
+  const ticketMedio = toNumber(state.extras.ticketMedio) || toNumber(state.margem.precoMedio);
+  const diasTrabalhados = toNumber(state.extras.diasTrabalhados) || 26;
+  const faturamentoMensal = toNumber(state.extras.faturamentoMensal);
+  const faturamentoDiario = toNumber(state.extras.faturamentoDiario) || (faturamentoMensal / diasTrabalhados);
+
+  const pontoEquilibrio = margemPercent > 0 ? custosFixosTotal / (margemPercent/100) : null;
+  const qtdMinimaVendas = (pontoEquilibrio && ticketMedio > 0) ? pontoEquilibrio/ticketMedio : null;
+  const diasParaEmpatar = (pontoEquilibrio && faturamentoDiario > 0) ? pontoEquilibrio/faturamentoDiario : null;
+  const pctCustosSobreFaturamento = faturamentoMensal > 0 ? (custosFixosTotal/faturamentoMensal)*100 : null;
+  const pctAtingidoPE = (pontoEquilibrio && faturamentoMensal >= 0) ? Math.min(150, (faturamentoMensal/pontoEquilibrio)*100) : null;
+
+  return { custosFixosTotal, margemPercent, memo, ticketMedio, diasTrabalhados, faturamentoMensal, faturamentoDiario,
+    pontoEquilibrio, qtdMinimaVendas, diasParaEmpatar, pctCustosSobreFaturamento, pctAtingidoPE };
+}
+
+function buildDiagnosis(r){
+  let txt = "";
+  if(r.pontoEquilibrio){
+    txt += `Sua empresa precisa faturar ${fmtBRL(r.pontoEquilibrio)} por mês apenas para cobrir todos os custos. Isso significa que você começa a gerar lucro somente a partir desse valor. `;
+  } else {
+    txt += `Não conseguimos calcular seu ponto de equilíbrio com precisão porque a margem de contribuição informada está zerada ou negativa — vale revisar os números da etapa de margem. `;
+  }
+  if(r.margemPercent < 30){
+    txt += `Observamos que sua margem de contribuição, hoje em ${fmtNum(r.margemPercent,1)}%, está abaixo do recomendado para a maioria dos segmentos — isso reduz o quanto cada venda realmente contribui para pagar as contas fixas. `;
+  } else if(r.margemPercent < 50){
+    txt += `Sua margem de contribuição está em ${fmtNum(r.margemPercent,1)}%, um patamar razoável, mas ainda com espaço real de melhora. `;
+  } else {
+    txt += `Sua margem de contribuição, em ${fmtNum(r.margemPercent,1)}%, está em um bom patamar — sinal de que sua precificação está bem estruturada. `;
+  }
+  if(r.pctCustosSobreFaturamento !== null){
+    if(r.pctCustosSobreFaturamento > 40){
+      txt += `Além disso, seus custos fixos representam ${fmtNum(r.pctCustosSobreFaturamento,1)}% do seu faturamento médio mensal — um percentual alto, que reduz sua margem de segurança. `;
+    } else {
+      txt += `Seus custos fixos representam ${fmtNum(r.pctCustosSobreFaturamento,1)}% do seu faturamento médio mensal, um percentual sob controle. `;
+    }
+  }
+  if(r.pctAtingidoPE !== null){
+    if(r.pctAtingidoPE < 100){
+      txt += `Com o faturamento médio atual, sua empresa cobre ${fmtNum(r.pctAtingidoPE,0)}% do ponto de equilíbrio — ainda falta faturar para começar a ter lucro real nesse ritmo. `;
+    } else {
+      txt += `Parabéns: seu faturamento médio atual já ultrapassa o ponto de equilíbrio, o que indica que a empresa está gerando lucro operacional. `;
+    }
+  }
+  txt += `Existem oportunidades claras para aumentar sua lucratividade.`;
+  return txt;
+}
+
+function buildChecklist(r){
+  const pool = [];
+  if(r.margemPercent < 40) pool.push("Reajustar preços considerando todos os custos");
+  if(r.margemPercent < 40) pool.push("Melhorar a margem de contribuição por produto ou serviço");
+  if(r.pctCustosSobreFaturamento !== null && r.pctCustosSobreFaturamento > 35) pool.push("Reduzir ou renegociar despesas fixas");
+  if(r.pctAtingidoPE !== null && r.pctAtingidoPE < 100) pool.push("Aumentar o ticket médio das vendas");
+  pool.push("Revisar despesas fixas todos os meses");
+  pool.push("Reduzir custos variáveis onde for possível");
+  pool.push("Criar novas fontes de receita");
+  if(r.pctAtingidoPE !== null && r.pctAtingidoPE >= 100) pool.push("Reinvestir parte do lucro em crescimento");
+  pool.push("Acompanhar esses indicadores todos os meses, não só uma vez");
+  return [...new Set(pool)].slice(0,6);
+}
+
+/* ============ RENDER ============ */
+function render(){
+  const app = document.getElementById("app");
+  const s = state.screen;
+  if(s === "intro") return renderIntro(app);
+  if(s === "empresa") return renderEmpresa(app);
+  if(s === "custos") return renderCustos(app);
+  if(s === "margem") return renderMargem(app);
+  if(s === "extras") return renderExtras(app);
+  if(s === "loading") return renderLoading(app);
+  if(s === "resultado") return renderResultado(app);
+  if(s === "conversao") return renderConversao(app);
+  if(s === "leadform") return renderLeadForm(app);
+  if(s === "obrigado") return renderObrigado(app);
+}
+
+function themeToggleHTML(){
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  return `<button class="theme-btn" id="theme-btn">${dark ? ICONS.sun : ICONS.moon}</button>`;
+}
+
+function shell(app, { showTop = true, stepIndex = null } = {}){
+  app.innerHTML = "";
+  if(showTop){
+    const top = document.createElement("div");
+    top.className = "topbar";
+    const back = document.createElement("button");
+    back.className = "back-btn" + (state.history.length === 0 ? " hidden" : "");
+    back.innerHTML = ICONS.back;
+    back.onclick = goBack;
+    top.appendChild(back);
+
+    const segWrap = document.createElement("div");
+    segWrap.className = "segments";
+    STEP_ORDER.forEach((id, i) => {
+      const seg = document.createElement("div");
+      seg.className = "segment";
+      const fill = document.createElement("div");
+      fill.className = "segment-fill";
+      const curIdx = STEP_ORDER.indexOf(state.screen);
+      let pct = 0;
+      if(i < curIdx) pct = 100;
+      if(i === curIdx) pct = 50;
+      fill.style.width = pct + "%";
+      seg.appendChild(fill);
+      segWrap.appendChild(seg);
+    });
+    top.appendChild(segWrap);
+    top.insertAdjacentHTML("beforeend", themeToggleHTML());
+    app.appendChild(top);
+    const stepEl = document.createElement("div");
+    stepEl.className = "step-label";
+    const curIdx = STEP_ORDER.indexOf(state.screen);
+    stepEl.textContent = curIdx >= 0 ? `Etapa ${curIdx+1} de ${STEP_ORDER.length}` : "";
+    app.appendChild(stepEl);
+    document.getElementById("theme-btn").onclick = toggleTheme;
+  } else {
+    const top = document.createElement("div");
+    top.className = "topbar";
+    top.style.justifyContent = "flex-end";
+    top.insertAdjacentHTML("beforeend", themeToggleHTML());
+    app.appendChild(top);
+    setTimeout(() => { const b = document.getElementById("theme-btn"); if(b) b.onclick = toggleTheme; }, 0);
+  }
+  const wrap = document.createElement("div");
+  wrap.className = "screen-wrap";
+  app.appendChild(wrap);
+  return wrap;
+}
+
+/* ---------- INTRO ---------- */
+function renderIntro(app){
+  const wrap = shell(app, { showTop:false });
+  wrap.innerHTML = `
+    <div class="intro-screen">
+      <span class="intro-badge">📊 Calculadora Inteligente</span>
+      <h1>Calculadora Inteligente de Ponto de Equilíbrio Empresarial</h1>
+      <p>Descubra quanto sua empresa precisa faturar para parar de trabalhar apenas para pagar contas.</p>
+      <ul class="intro-list">
+        <li>${ICONS.check}<span>Descubra seu ponto de equilíbrio</span></li>
+        <li>${ICONS.check}<span>Descubra sua margem real</span></li>
+        <li>${ICONS.check}<span>Veja se sua empresa gera lucro</span></li>
+        <li>${ICONS.check}<span>Receba recomendações personalizadas</span></li>
+      </ul>
+      <div class="intro-meta">${ICONS.bolt}<span>Leva cerca de 3 minutos</span></div>
+      <button class="primary-btn" id="start-btn">Começar análise gratuita</button>
+    </div>
+  `;
+  document.getElementById("start-btn").onclick = () => goTo("empresa");
+}
+
+/* ---------- ETAPA 2: EMPRESA ---------- */
+function renderEmpresa(app){
+  const wrap = shell(app);
+  const e = state.empresa;
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow">Sobre sua empresa</span>
+    <h1 class="step-title">Conte um pouco sobre o seu negócio</h1>
+    <p class="step-sub">Isso ajuda a personalizar seu diagnóstico. O nome é opcional.</p>
+
+    <div class="field"><label>Nome da empresa (opcional)</label><input type="text" id="f-nome" value="${e.nome}" placeholder="Ex: Padaria Bom Pão"></div>
+
+    <div class="field"><label>Segmento</label>
+      <select id="f-segmento">
+        <option value="">Selecione</option>
+        ${SEGMENTOS.map(o => `<option value="${o}" ${e.segmento===o?"selected":""}>${o}</option>`).join("")}
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Cidade</label><input type="text" id="f-cidade" value="${e.cidade}" placeholder="Sua cidade"></div>
+      <div class="field"><label>Estado</label>
+        <select id="f-estado">
+          <option value="">UF</option>
+          ${UFS.map(uf => `<option value="${uf}" ${e.estado===uf?"selected":""}>${uf}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+
+    <div class="field"><label>Quantos anos sua empresa possui?</label>
+      <select id="f-anos">
+        <option value="">Selecione</option>
+        ${ANOS_EMPRESA.map(o => `<option value="${o}" ${e.anos===o?"selected":""}>${o}</option>`).join("")}
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Nº de funcionários</label><input type="number" min="0" id="f-func" value="${e.funcionarios}" placeholder="Ex: 5"></div>
+      <div class="field"><label>Faixa de faturamento</label>
+        <select id="f-faixa">
+          <option value="">Selecione</option>
+          ${FAIXAS_FATURAMENTO.map(o => `<option value="${o}" ${e.faixa===o?"selected":""}>${o}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+
+    <button class="primary-btn" id="next-btn" style="margin-top:8px;">Continuar</button>
+  `;
+  wrap.appendChild(div);
+
+  document.getElementById("next-btn").onclick = () => {
+    state.empresa = {
+      nome: document.getElementById("f-nome").value.trim(),
+      segmento: document.getElementById("f-segmento").value,
+      cidade: document.getElementById("f-cidade").value.trim(),
+      estado: document.getElementById("f-estado").value,
+      anos: document.getElementById("f-anos").value,
+      funcionarios: document.getElementById("f-func").value,
+      faixa: document.getElementById("f-faixa").value
+    };
+    goTo("custos");
+  };
+}
+
+/* ---------- ETAPA 3: CUSTOS FIXOS ---------- */
+function renderCustos(app){
+  const wrap = shell(app);
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow">Custos fixos</span>
+    <h1 class="step-title">Quais são os custos fixos da sua empresa?</h1>
+    <p class="step-sub">Adicione quantos itens forem necessários. Você pode remover ou adicionar a qualquer momento.</p>
+    <div id="cost-rows"></div>
+    <button class="add-cost-btn" id="add-cost">${ICONS.plus}<span>Adicionar custo</span></button>
+    <div class="cost-total"><span class="label">Total de custos fixos</span><span class="value" id="cost-total-val">${fmtBRL(0)}</span></div>
+    <button class="primary-btn" id="next-btn" style="margin-top:20px;">Continuar</button>
+  `;
+  wrap.appendChild(div);
+
+  const rowsEl = div.querySelector("#cost-rows");
+  const totalEl = div.querySelector("#cost-total-val");
+
+  function paintRows(){
+    rowsEl.innerHTML = "";
+    state.custos.forEach((c, i) => {
+      const row = document.createElement("div");
+      row.className = "cost-row";
+      row.innerHTML = `
+        <select data-idx="${i}" class="cat-select">
+          ${COST_CATEGORIES.map(cat => `<option value="${cat}" ${c.categoria===cat?"selected":""}>${cat}</option>`).join("")}
+        </select>
+        <input type="number" min="0" step="0.01" data-idx="${i}" class="val-input" placeholder="R$ 0,00" value="${c.valor}">
+        <button class="rm-btn" data-idx="${i}">${ICONS.trash}</button>
+      `;
+      rowsEl.appendChild(row);
+    });
+    rowsEl.querySelectorAll(".cat-select").forEach(el => el.onchange = (ev) => {
+      state.custos[+ev.target.dataset.idx].categoria = ev.target.value;
+    });
+    rowsEl.querySelectorAll(".val-input").forEach(el => el.oninput = (ev) => {
+      state.custos[+ev.target.dataset.idx].valor = ev.target.value;
+      updateTotal();
+    });
+    rowsEl.querySelectorAll(".rm-btn").forEach(el => el.onclick = (ev) => {
+      const idx = +ev.currentTarget.dataset.idx;
+      state.custos.splice(idx,1);
+      paintRows();
+      updateTotal();
+    });
+  }
+  function updateTotal(){
+    const total = state.custos.reduce((s,c) => s + toNumber(c.valor), 0);
+    totalEl.textContent = fmtBRL(total);
+  }
+
+  paintRows();
+  updateTotal();
+
+  document.getElementById("add-cost").onclick = () => {
+    state.custos.push({ categoria:"Outros", valor:"" });
+    paintRows();
+    updateTotal();
+  };
+  document.getElementById("next-btn").onclick = () => goTo("margem");
+}
+
+/* ---------- ETAPA 4: MARGEM DE CONTRIBUIÇÃO ---------- */
+function renderMargem(app){
+  const wrap = shell(app);
+  const m = state.margem;
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow">Margem de contribuição</span>
+    <h1 class="step-title">Você sabe sua margem de contribuição?</h1>
+    <div class="toggle-row">
+      <div class="toggle-opt ${m.modo==='informar'?'active':''}" id="opt-informar">Já sei o percentual</div>
+      <div class="toggle-opt ${m.modo==='calcular'?'active':''}" id="opt-calcular">Calcular automaticamente</div>
+    </div>
+    <div id="margem-fields"></div>
+    <button class="primary-btn" id="next-btn" style="margin-top:8px;">Continuar</button>
+  `;
+  wrap.appendChild(div);
+
+  const fieldsEl = div.querySelector("#margem-fields");
+
+  function paintFields(){
+    if(state.margem.modo === "informar"){
+      fieldsEl.innerHTML = `
+        <div class="field"><label>Margem de contribuição (%)</label><input type="number" min="0" max="100" step="0.1" id="f-percentual" value="${state.margem.percentual}" placeholder="Ex: 45"></div>
+        <p class="step-sub">Não sabe o percentual exato? Clique em "Calcular automaticamente" acima.</p>
+      `;
+      const el = fieldsEl.querySelector("#f-percentual");
+      el.oninput = () => state.margem.percentual = el.value;
+    } else {
+      fieldsEl.innerHTML = `
+        <div class="field"><label>Preço médio de venda (R$)</label><input type="number" min="0" step="0.01" id="f-preco" value="${state.margem.precoMedio}" placeholder="Ex: 100,00"></div>
+        <div class="field-row">
+          <div class="field"><label>Custos variáveis (R$/unid.)</label><input type="number" min="0" step="0.01" id="f-cv" value="${state.margem.custosVariaveis}" placeholder="Ex: 20,00"></div>
+          <div class="field"><label>Fretes (R$/unid.)</label><input type="number" min="0" step="0.01" id="f-fretes" value="${state.margem.fretes}" placeholder="Ex: 5,00"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Impostos (%)</label><input type="number" min="0" step="0.1" id="f-impostos" value="${state.margem.impostos}" placeholder="Ex: 6"></div>
+          <div class="field"><label>Comissões (%)</label><input type="number" min="0" step="0.1" id="f-comissoes" value="${state.margem.comissoes}" placeholder="Ex: 5"></div>
+        </div>
+        <div class="field"><label>Taxas (cartão, plataforma etc.) (%)</label><input type="number" min="0" step="0.1" id="f-taxas" value="${state.margem.taxas}" placeholder="Ex: 3"></div>
+        <div class="memo-box" id="memo-box"></div>
+      `;
+      const ids = ["f-preco","f-cv","f-fretes","f-impostos","f-comissoes","f-taxas"];
+      const keys = ["precoMedio","custosVariaveis","fretes","impostos","comissoes","taxas"];
+      ids.forEach((id,i) => {
+        const el = fieldsEl.querySelector("#"+id);
+        el.oninput = () => { state.margem[keys[i]] = el.value; paintMemo(); };
+      });
+      paintMemo();
+    }
+  }
+
+  function paintMemo(){
+    const memoEl = fieldsEl.querySelector("#memo-box");
+    if(!memoEl) return;
+    const r = computeAll();
+    if(!r.memo){ memoEl.innerHTML = ""; return; }
+    const d = r.memo;
+    memoEl.innerHTML = `
+      <div class="memo-title">Memória do cálculo</div>
+      <div class="memo-line"><span>Preço médio</span><span>${fmtBRL(d.preco)}</span></div>
+      <div class="memo-line"><span>Custos variáveis + fretes</span><span>${fmtBRL(d.variavelFixaReais)}</span></div>
+      <div class="memo-line"><span>Impostos + comissões + taxas (${fmtNum(d.percentualSum,1)}%)</span><span>${fmtBRL(d.variavelPercReais)}</span></div>
+      <div class="memo-line"><span>Custo variável total por unidade</span><span>${fmtBRL(d.custoVariavelUnidade)}</span></div>
+      <div class="memo-line total"><span>Margem de contribuição</span><span>${fmtBRL(d.margemReais)} (${fmtNum(d.margemPercent,1)}%)</span></div>
+    `;
+  }
+
+  document.getElementById("opt-informar").onclick = () => { state.margem.modo = "informar"; render(); };
+  document.getElementById("opt-calcular").onclick = () => { state.margem.modo = "calcular"; render(); };
+  paintFields();
+
+  document.getElementById("next-btn").onclick = () => {
+    if(state.margem.modo === "calcular" && state.margem.precoMedio && !state.extras.ticketMedio){
+      state.extras.ticketMedio = state.margem.precoMedio;
+    }
+    goTo("extras");
+  };
+}
+
+/* ---------- ETAPA 5: INFORMAÇÕES EXTRAS ---------- */
+function renderExtras(app){
+  const wrap = shell(app);
+  const ex = state.extras;
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow">Informações extras</span>
+    <h1 class="step-title">Só mais alguns números</h1>
+    <p class="step-sub">Isso ajuda a calcular quantas vendas você precisa fazer e em quantos dias.</p>
+
+    <div class="field"><label>Ticket médio (R$)</label><input type="number" min="0" step="0.01" id="f-ticket" value="${ex.ticketMedio}" placeholder="Ex: 100,00"></div>
+    <div class="field"><label>Dias trabalhados por mês</label><input type="number" min="1" max="31" id="f-dias" value="${ex.diasTrabalhados}" placeholder="Ex: 26"></div>
+    <div class="field"><label>Faturamento médio mensal (R$)</label><input type="number" min="0" step="0.01" id="f-fatmes" value="${ex.faturamentoMensal}" placeholder="Ex: 30000,00"></div>
+    <div class="field"><label>Faturamento médio diário (R$)</label><input type="number" min="0" step="0.01" id="f-fatdia" value="${ex.faturamentoDiario}" placeholder="Deixe em branco para calcular automaticamente"></div>
+    <p class="field-note" style="margin-bottom:18px;">Se não souber o faturamento diário, deixe em branco — calculamos com base no mensal.</p>
+
+    <button class="primary-btn" id="next-btn">Ver meu diagnóstico</button>
+  `;
+  wrap.appendChild(div);
+
+  document.getElementById("next-btn").onclick = () => {
+    state.extras = {
+      ticketMedio: document.getElementById("f-ticket").value,
+      diasTrabalhados: document.getElementById("f-dias").value || "26",
+      faturamentoMensal: document.getElementById("f-fatmes").value,
+      faturamentoDiario: document.getElementById("f-fatdia").value
+    };
+    goTo("loading", { pushHistory:false });
+    setTimeout(() => goTo("resultado", { pushHistory:false }), 1400);
+  };
+}
+
+/* ---------- LOADING ---------- */
+function renderLoading(app){
+  const wrap = shell(app, { showTop:false });
+  wrap.innerHTML = `
+    <div class="loading-screen">
+      <div class="spinner"></div>
+      <p class="loading-text">Calculando seu ponto de equilíbrio...</p>
+    </div>
+  `;
+}
+
+/* ---------- GAUGE SVG ---------- */
+function renderGaugeSVG(pct, color){
+  const clamped = Math.max(0, Math.min(100, pct));
+  const cx=70, cy=70, r=56;
+  const startAngle = 180, endAngle = 0; // semicírculo
+  const angle = 180 - (clamped/100)*180;
+  const rad = angle * Math.PI/180;
+  const needleX = cx + r*0.85*Math.cos(rad);
+  const needleY = cy - r*0.85*Math.sin(rad);
+  const arcLen = Math.PI * r;
+  const dashOffset = arcLen * (1 - clamped/100);
+  return `
+    <svg viewBox="0 0 140 82" width="140" height="82">
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}" fill="none" stroke="var(--border)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="${arcLen}" stroke-dashoffset="${dashOffset}"/>
+      <line x1="${cx}" y1="${cy}" x2="${needleX}" y2="${needleY}" stroke="var(--navy)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="5" fill="var(--navy)"/>
+    </svg>
+  `;
+}
+
+/* ---------- RESULTADO ---------- */
+let lastResult = null;
+function renderResultado(app){
+  const r = computeAll();
+  lastResult = r;
+  const wrap = shell(app, { showTop:false });
+  const div = document.createElement("div");
+  div.className = "screen";
+
+  const margemColor = r.margemPercent >= 50 ? "var(--teal)" : r.margemPercent >= 30 ? "var(--amber)" : "var(--red)";
+  const peColor = r.pctAtingidoPE === null ? "var(--text-muted)" : r.pctAtingidoPE >= 100 ? "var(--teal)" : r.pctAtingidoPE >= 60 ? "var(--amber)" : "var(--red)";
+
+  div.innerHTML = `
+    <span class="eyebrow">${ICONS.spark} Diagnóstico pronto</span>
+    <h1 class="step-title">${state.empresa.nome ? state.empresa.nome + ", aqui está o seu raio-x financeiro" : "Aqui está o seu raio-x financeiro"}</h1>
+
+    <div class="gauge-row">
+      <div class="gauge-block">
+        ${renderGaugeSVG(r.margemPercent, margemColor)}
+        <div class="g-value" style="color:${margemColor};">${fmtNum(r.margemPercent,1)}%</div>
+        <div class="g-title">Margem de contribuição</div>
+      </div>
+      <div class="gauge-block">
+        ${renderGaugeSVG(r.pctAtingidoPE || 0, peColor)}
+        <div class="g-value" style="color:${peColor};">${r.pctAtingidoPE !== null ? fmtNum(r.pctAtingidoPE,0)+"%" : "—"}</div>
+        <div class="g-title">Do ponto de equilíbrio já coberto</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card wide"><div class="k-label">Ponto de equilíbrio mensal</div><div class="k-value">${r.pontoEquilibrio ? fmtBRL(r.pontoEquilibrio) : "—"}</div></div>
+      <div class="kpi-card"><div class="k-label">Custos fixos totais</div><div class="k-value">${fmtBRL(r.custosFixosTotal)}</div></div>
+      <div class="kpi-card"><div class="k-label">Qtd. mínima de vendas</div><div class="k-value">${r.qtdMinimaVendas ? fmtNum(r.qtdMinimaVendas,0)+"/mês" : "—"}</div></div>
+      <div class="kpi-card"><div class="k-label">Dias p/ empatar</div><div class="k-value">${r.diasParaEmpatar ? fmtNum(r.diasParaEmpatar,0)+" dias" : "—"}</div></div>
+      <div class="kpi-card"><div class="k-label">Custos fixos / faturamento</div><div class="k-value">${r.pctCustosSobreFaturamento !== null ? fmtNum(r.pctCustosSobreFaturamento,1)+"%" : "—"}</div></div>
+    </div>
+
+    <div class="diagnosis-box">
+      <div class="d-title">${ICONS.spark}<span>Diagnóstico personalizado</span></div>
+      <p>${buildDiagnosis(r)}</p>
+    </div>
+
+    <span class="eyebrow">Recomendações</span>
+    <ul class="check-list">
+      ${buildChecklist(r).map(item => `<li>${ICONS.check}<span>${item}</span></li>`).join("")}
+    </ul>
+
+    <button class="primary-btn" id="next-btn">Ver minha análise completa</button>
+  `;
+  wrap.appendChild(div);
+  document.getElementById("next-btn").onclick = () => goTo("conversao", { pushHistory:false });
+}
+
+/* ---------- CONVERSÃO ---------- */
+function renderConversao(app){
+  const wrap = shell(app, { showTop:false });
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow" style="align-self:center;">Sua análise identificou oportunidades de melhoria</span>
+    <p class="conv-text">Parabéns! Sua análise foi concluída. Encontramos oportunidades reais para melhorar seus resultados financeiros. Você pode simplesmente baixar o relatório gratuito ou conversar com um especialista que vai analisar seus números e mostrar exatamente onde estão as maiores oportunidades de lucro.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="c-title">Relatório Gratuito</div>
+        <ul>
+          <li>${ICONS.check}<span>Resultado da calculadora</span></li>
+          <li>${ICONS.check}<span>PDF para download</span></li>
+          <li>${ICONS.check}<span>Diagnóstico automático</span></li>
+        </ul>
+      </div>
+      <div class="compare-card highlight">
+        <div class="c-title">Análise Estratégica</div>
+        <ul>
+          <li>${ICONS.check}<span>Tudo do relatório gratuito</span></li>
+          <li>${ICONS.check}<span>Reunião online ao vivo (até 60 min)</span></li>
+          <li>${ICONS.check}<span>Diagnóstico personalizado</span></li>
+          <li>${ICONS.check}<span>Análise financeira aprofundada</span></li>
+          <li>${ICONS.check}<span>Oportunidades de redução de custos</span></li>
+          <li>${ICONS.check}<span>Sugestões para aumentar o lucro</span></li>
+          <li>${ICONS.check}<span>Plano de ação prático</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <span class="offer-badge" style="align-self:center; margin:0 auto 4px;">🔥 Oferta exclusiva para quem concluiu a análise</span>
+    <div class="price-box">
+      <div class="price-old">De R$49,90</div>
+      <div class="price-new">Por apenas R$19,90</div>
+    </div>
+    <button class="primary-btn" id="cta-btn">Quero minha análise estratégica por R$19,90</button>
+
+    <ul class="security-list">
+      <li>${ICONS.shield}<span>Compra segura</span></li>
+      <li>${ICONS.lock}<span>Pagamento via Hotmart</span></li>
+      <li>${ICONS.check}<span>Acesso imediato</span></li>
+      <li>${ICONS.shield}<span>Garantia conforme política da plataforma</span></li>
+    </ul>
+
+    <button class="ghost-link" id="skip-btn">Prefiro baixar apenas o relatório gratuito</button>
+  `;
+  wrap.appendChild(div);
+  document.getElementById("cta-btn").onclick = () => window.open(HOTMART_LINK, "_blank");
+  document.getElementById("skip-btn").onclick = () => goTo("leadform");
+}
+
+/* ---------- LEAD FORM (relatório grátis) ---------- */
+function renderLeadForm(app){
+  const wrap = shell(app);
+  const l = state.lead;
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <span class="eyebrow">Relatório gratuito</span>
+    <h1 class="step-title">Pra onde enviamos seu relatório?</h1>
+    <div class="field"><label>Nome</label><input type="text" id="f-lnome" value="${l.nome}" placeholder="Seu nome"></div>
+    <div class="field"><label>E-mail</label><input type="email" id="f-lemail" value="${l.email}" placeholder="seuemail@exemplo.com"></div>
+    <div class="field"><label>WhatsApp</label><input type="tel" id="f-lwhats" value="${l.whatsapp}" placeholder="(47) 90000-0000"></div>
+    <div class="field-row">
+      <div class="field"><label>Cidade</label><input type="text" id="f-lcidade" value="${l.cidade || state.empresa.cidade}" placeholder="Sua cidade"></div>
+      <div class="field"><label>Estado</label>
+        <select id="f-lestado">
+          <option value="">UF</option>
+          ${UFS.map(uf => `<option value="${uf}" ${(l.estado||state.empresa.estado)===uf?"selected":""}>${uf}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="f-lgpd" ${l.lgpd?"checked":""}>
+      <label for="f-lgpd">Autorizo o uso dos meus dados para receber o relatório e contatos relacionados, conforme a Lei Geral de Proteção de Dados (LGPD).</label>
+    </div>
+    <button class="primary-btn" id="submit-btn" disabled>Baixar meu relatório em PDF</button>
+  `;
+  wrap.appendChild(div);
+
+  const nome = div.querySelector("#f-lnome");
+  const email = div.querySelector("#f-lemail");
+  const whats = div.querySelector("#f-lwhats");
+  const cidade = div.querySelector("#f-lcidade");
+  const estado = div.querySelector("#f-lestado");
+  const lgpd = div.querySelector("#f-lgpd");
+  const btn = div.querySelector("#submit-btn");
+
+  function validate(){
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    const whatsOk = whats.value.replace(/\D/g,"").length >= 10;
+    btn.disabled = !(nome.value.trim().length > 1 && emailOk && whatsOk && lgpd.checked);
+  }
+  [nome,email,whats,lgpd].forEach(el => el.addEventListener("input", validate));
+  lgpd.addEventListener("change", validate);
+
+  btn.onclick = () => {
+    state.lead = { nome:nome.value.trim(), email:email.value.trim(), whatsapp:whats.value.trim(), cidade:cidade.value.trim(), estado:estado.value, lgpd:lgpd.checked };
+    const r = computeAll();
+    sendLeadToSheet({
+      data_hora: new Date().toLocaleString("pt-BR"),
+      origem: "ponto_equilibrio",
+      nome: state.lead.nome, email: state.lead.email, whatsapp: state.lead.whatsapp,
+      cidade: state.lead.cidade, estado: state.lead.estado,
+      empresa: state.empresa.nome, segmento: state.empresa.segmento,
+      margem_percent: fmtNum(r.margemPercent,1),
+      ponto_equilibrio: r.pontoEquilibrio ? fmtNum(r.pontoEquilibrio,2) : "",
+      custos_fixos: fmtNum(r.custosFixosTotal,2)
+    });
+    generatePDF(r);
+    goTo("obrigado", { pushHistory:false });
+  };
+}
+
+/* ---------- PDF ---------- */
+function generatePDF(r){
+  try{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const margin = 18;
+    let y = 22;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(16);
+    doc.text("Relatório de Ponto de Equilíbrio Empresarial", margin, y); y += 8;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,100,110);
+    doc.text(`${state.empresa.nome || "Sua empresa"} · ${new Date().toLocaleDateString("pt-BR")}`, margin, y); y += 12;
+
+    doc.setTextColor(20,30,40);
+    doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Resumo dos números", margin, y); y += 8;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+    const lines = [
+      `Custos fixos totais: ${fmtBRL(r.custosFixosTotal)}`,
+      `Margem de contribuição: ${fmtNum(r.margemPercent,1)}%`,
+      `Ponto de equilíbrio mensal: ${r.pontoEquilibrio ? fmtBRL(r.pontoEquilibrio) : "não calculado"}`,
+      `Quantidade mínima de vendas: ${r.qtdMinimaVendas ? fmtNum(r.qtdMinimaVendas,0)+" por mês" : "não calculado"}`,
+      `Dias necessários para empatar: ${r.diasParaEmpatar ? fmtNum(r.diasParaEmpatar,0)+" dias" : "não calculado"}`,
+      `Custos fixos / faturamento: ${r.pctCustosSobreFaturamento !== null ? fmtNum(r.pctCustosSobreFaturamento,1)+"%" : "não informado"}`
+    ];
+    lines.forEach(l => { doc.text(l, margin, y); y += 7; });
+    y += 4;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Diagnóstico", margin, y); y += 8;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+    const diagText = doc.splitTextToSize(buildDiagnosis(r), 174);
+    doc.text(diagText, margin, y); y += diagText.length*5.5 + 8;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Recomendações", margin, y); y += 8;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+    buildChecklist(r).forEach(item => {
+      const t = doc.splitTextToSize("• " + item, 174);
+      doc.text(t, margin, y); y += t.length*5.5 + 1;
+    });
+
+    y += 6;
+    doc.setFontSize(9); doc.setTextColor(140,150,160);
+    doc.text("Osmair Junior · Gestão Financeira para MPEs", margin, y);
+
+    doc.save("relatorio-ponto-de-equilibrio.pdf");
+  }catch(err){
+    console.error("Falha ao gerar PDF:", err);
+  }
+}
+
+/* ---------- OBRIGADO ---------- */
+function renderObrigado(app){
+  const wrap = shell(app, { showTop:false });
+  const div = document.createElement("div");
+  div.className = "screen";
+  div.innerHTML = `
+    <div class="loading-screen">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--teal-wash);color:var(--teal);display:flex;align-items:center;justify-content:center;">${ICONS.check}</div>
+      <h1 class="step-title" style="text-align:center;">Relatório baixado com sucesso!</h1>
+      <p class="loading-text">Verifique a pasta de downloads do seu navegador. Se quiser ir além do relatório, a análise estratégica com o Osmair continua disponível por R$19,90.</p>
+      <button class="primary-btn" id="cta-btn2" style="max-width:280px;">Quero a análise estratégica</button>
+    </div>
+  `;
+  wrap.appendChild(div);
+  document.getElementById("cta-btn2").onclick = () => window.open(HOTMART_LINK, "_blank");
+}
+
+/* ============ INIT ============ */
+initTheme();
+loadState();
+render();
+</script>
+</body>
+</html>
