@@ -409,6 +409,20 @@ let state = {
 };
 const WHATSAPP_NUMBER = "5547996242669";
 
+/* Cole aqui a URL do seu Web App do Google Apps Script (veja o passo a passo).
+   Enquanto estiver como "", os leads não são enviados a lugar nenhum. */
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwy0eDpHP6CTbx1If7dyXMixcQz1TmtOCrVzD0q5L34K3Rc0LU6IRXkj0TQyp8plRdj/exec";
+
+function sendLeadToSheet(payload){
+  if(!GOOGLE_SHEETS_URL) return; // ainda não configurado
+  fetch(GOOGLE_SHEETS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify(payload)
+  }).catch(() => { /* falha silenciosa: não trava a experiência do lead */ });
+}
+
 /* ============ NAVIGATION ============ */
 function goTo(id, { pushHistory = true } = {}){
   if(pushHistory) state.history.push(state.screen);
@@ -652,6 +666,23 @@ function renderForm(app){
 
   btn.onclick = () => {
     state.lead = { nome: nome.value.trim(), email: email.value.trim(), whatsapp: whats.value.trim() };
+
+    const { pillarPct, notaGeral } = computeScores();
+    const level = levelFor(notaGeral);
+    sendLeadToSheet({
+      data_hora: new Date().toLocaleString("pt-BR"),
+      nome: state.lead.nome,
+      email: state.lead.email,
+      whatsapp: state.lead.whatsapp,
+      nota_geral: notaGeral,
+      nivel: level.name,
+      pilar_organizacao: pillarPct.find(p => p.id === "p1").pct,
+      pilar_caixa: pillarPct.find(p => p.id === "p2").pct,
+      pilar_rentabilidade: pillarPct.find(p => p.id === "p3").pct,
+      pilar_indicadores: pillarPct.find(p => p.id === "p4").pct,
+      pilar_planejamento: pillarPct.find(p => p.id === "p5").pct
+    });
+
     goTo("result", { pushHistory:false });
   };
 }
