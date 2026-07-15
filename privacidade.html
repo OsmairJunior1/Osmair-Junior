@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidade | Osmair BPO</title>
+<meta name="description" content="Política de Privacidade da Osmair BPO — como coletamos, usamos e protegemos os dados pessoais dos nossos clientes e visitantes, em conformidade com a LGPD.">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --bg-alt:#F7F8FA;
+    --surface:#FFFFFF;
+    --navy:#163A5F;
+    --navy-wash:#EAF0F5;
+    --teal:#63E339;
+    --teal-light:#54CC2C;
+    --teal-wash:#E9FBE0;
+    --teal-dark:#184D3A;
+    --text:#2D3748;
+    --text-muted:#64748B;
+    --border:#E4E8EC;
+    --shadow: 0 1px 2px rgba(22,58,95,0.05), 0 8px 24px -12px rgba(22,58,95,0.14);
+    --maxw:1160px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+  a{ color:var(--teal-dark); text-decoration:underline; }
+  a.logo, a.footer-col a, a.back-link{ text-decoration:none; }
+  h1,h2,h3{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; color:var(--navy); letter-spacing:-0.2px; }
+  .container{ max-width:820px; margin:0 auto; padding:0 24px; }
+  .wide{ max-width:var(--maxw); margin:0 auto; padding:0 24px; }
+
+  header{ background:rgba(255,255,255,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:20; }
+  .nav-wrap{ max-width:var(--maxw); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:16px 24px; }
+  .logo{ font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:18px; display:flex; align-items:center; gap:9px; color:var(--navy); }
+  .logo .dot{ width:9px; height:9px; border-radius:50%; background:var(--teal); }
+  .back-link{ font-size:13.5px; font-weight:600; color:var(--teal-dark); display:flex; align-items:center; gap:6px; }
+  .back-link svg{ width:16px; height:16px; }
+
+  .hero-block{ padding:56px 24px 20px; background:linear-gradient(180deg, var(--bg-alt), var(--bg) 70%); }
+  .eyebrow{ display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; color:var(--teal-dark); background:var(--teal-wash); padding:6px 14px; border-radius:100px; margin-bottom:16px; }
+  .hero-block h1{ font-size:32px; line-height:1.25; margin:0 0 10px; }
+  .hero-block p{ font-size:14.5px; color:var(--text-muted); line-height:1.6; margin:0; }
+
+  .toc{ background:var(--bg-alt); border:1.5px solid var(--border); border-radius:16px; padding:22px 24px; margin:32px 0 44px; }
+  .toc h2{ font-size:14px; margin:0 0 12px; }
+  .toc ol{ margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; }
+  .toc a{ font-size:13.5px; color:var(--text); text-decoration:none; }
+  .toc a:hover{ color:var(--teal-dark); text-decoration:underline; }
+
+  article{ padding:0 0 60px; }
+  article section{ margin-bottom:36px; scroll-margin-top:90px; }
+  article h2{ font-size:19px; margin:0 0 12px; padding-top:6px; border-top:1px solid var(--border); padding-top:20px; }
+  article section:first-of-type h2{ border-top:none; padding-top:0; }
+  article p{ font-size:14.5px; line-height:1.75; margin:0 0 14px; color:var(--text); }
+  article ul{ margin:0 0 14px; padding-left:20px; display:flex; flex-direction:column; gap:8px; }
+  article ul li{ font-size:14.5px; line-height:1.65; color:var(--text); }
+  article strong{ color:var(--navy); }
+
+  .contact-box{ background:var(--navy); color:#fff; border-radius:18px; padding:26px 26px; margin-top:8px; }
+  .contact-box h3{ color:#fff; font-size:16px; margin:0 0 8px; }
+  .contact-box p{ color:rgba(255,255,255,0.82); font-size:14px; line-height:1.6; margin:0 0 14px; }
+  .contact-box a{ color:var(--teal); font-weight:700; text-decoration:none; }
+  .contact-box a:hover{ text-decoration:underline; }
+
+  .updated-note{ font-size:12.5px; color:var(--text-muted); margin-top:36px; padding-top:18px; border-top:1px dashed var(--border); }
+
+  footer{ padding:40px 24px 26px; border-top:1px solid var(--border); background:var(--bg-alt); }
+  .footer-inner{ max-width:var(--maxw); margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:14px; }
+  .footer-inner p{ font-size:12.5px; color:var(--text-muted); margin:0; }
+  .footer-links{ display:flex; gap:18px; }
+  .footer-links a{ font-size:12.5px; color:var(--text-muted); text-decoration:none; }
+  .footer-links a:hover{ color:var(--teal-dark); }
+
+  @media (max-width:600px){
+    .hero-block h1{ font-size:26px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <a href="bpo.html" class="logo"><span class="dot"></span>Osmair Junior</a>
+    <a href="bpo.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Voltar ao site
+    </a>
+  </div>
+</header>
+
+<div class="hero-block">
+  <div class="container">
+    <span class="eyebrow">LGPD · Lei nº 13.709/2018</span>
+    <h1>Política de Privacidade</h1>
+    <p>Esta política explica, de forma clara e objetiva, como a Osmair BPO coleta, usa, armazena e protege os dados pessoais de clientes, visitantes do site e demais titulares, em conformidade com a Lei Geral de Proteção de Dados (LGPD).</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="toc">
+    <h2>Nesta política</h2>
+    <ol>
+      <li><a href="#quem-somos">1. Quem somos</a></li>
+      <li><a href="#dados-coletados">2. Quais dados coletamos</a></li>
+      <li><a href="#finalidade">3. Para que usamos seus dados</a></li>
+      <li><a href="#base-legal">4. Base legal para o tratamento</a></li>
+      <li><a href="#compartilhamento">5. Com quem compartilhamos seus dados</a></li>
+      <li><a href="#seguranca">6. Como protegemos seus dados</a></li>
+      <li><a href="#retencao">7. Por quanto tempo guardamos seus dados</a></li>
+      <li><a href="#direitos">8. Seus direitos como titular</a></li>
+      <li><a href="#cookies">9. Cookies</a></li>
+      <li><a href="#alteracoes">10. Alterações desta política</a></li>
+      <li><a href="#contato">11. Encarregado de dados (DPO) e contato</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <section id="quem-somos">
+      <h2>1. Quem somos</h2>
+      <p>A <strong>Osmair BPO</strong> é uma empresa especializada em terceirização financeira (BPO Financeiro) para micro e pequenas empresas, oferecendo serviços de gestão de fluxo de caixa, conciliação bancária, relatórios financeiros e consultoria estratégica. Somos os controladores dos dados pessoais tratados por meio do nosso site e dos serviços contratados por nossos clientes.</p>
+    </section>
+
+    <section id="dados-coletados">
+      <h2>2. Quais dados coletamos</h2>
+      <p>Coletamos diferentes categorias de dados, dependendo da sua relação conosco:</p>
+      <ul>
+        <li><strong>Dados de contato:</strong> nome, e-mail, telefone/WhatsApp, cidade e estado, informados em formulários do site (como o diagnóstico financeiro ou o pedido de contato).</li>
+        <li><strong>Dados empresariais:</strong> nome da empresa, segmento de atuação e informações financeiras que você opta por compartilhar ao usar nossas calculadoras e diagnósticos gratuitos.</li>
+        <li><strong>Dados de clientes:</strong> caso você contrate nossos serviços de BPO financeiro, tratamos os dados financeiros necessários à prestação do serviço (lançamentos, extratos, notas fiscais e documentos correlatos), sempre dentro do escopo definido em contrato.</li>
+        <li><strong>Dados de navegação:</strong> informações técnicas coletadas automaticamente, como endereço IP, tipo de navegador e páginas visitadas, geralmente por meio de cookies.</li>
+      </ul>
+    </section>
+
+    <section id="finalidade">
+      <h2>3. Para que usamos seus dados</h2>
+      <ul>
+        <li>Prestar os serviços de BPO financeiro contratados;</li>
+        <li>Responder a contatos e solicitações feitas pelo site ou WhatsApp;</li>
+        <li>Gerar diagnósticos, relatórios e materiais personalizados a partir das informações que você compartilha voluntariamente;</li>
+        <li>Enviar comunicações comerciais relacionadas aos nossos serviços, quando autorizado por você;</li>
+        <li>Cumprir obrigações legais, contábeis e fiscais aplicáveis à nossa atividade;</li>
+        <li>Melhorar a experiência de navegação e o conteúdo do nosso site.</li>
+      </ul>
+    </section>
+
+    <section id="base-legal">
+      <h2>4. Base legal para o tratamento</h2>
+      <p>Tratamos seus dados pessoais com base nas seguintes hipóteses legais previstas na LGPD (art. 7º):</p>
+      <ul>
+        <li><strong>Consentimento:</strong> quando você preenche um formulário e concorda com esta política, como no diagnóstico financeiro gratuito.</li>
+        <li><strong>Execução de contrato:</strong> quando os dados são necessários para prestar o serviço de BPO financeiro contratado.</li>
+        <li><strong>Cumprimento de obrigação legal ou regulatória:</strong> quando o tratamento é exigido pela legislação contábil, fiscal ou tributária.</li>
+        <li><strong>Legítimo interesse:</strong> para melhorias no site e comunicações comerciais compatíveis com a finalidade original da coleta.</li>
+      </ul>
+    </section>
+
+    <section id="compartilhamento">
+      <h2>5. Com quem compartilhamos seus dados</h2>
+      <p>Não vendemos nem alugamos seus dados pessoais a terceiros. Compartilhamos informações apenas quando necessário, com:</p>
+      <ul>
+        <li>Prestadores de serviços essenciais à nossa operação, como hospedagem de site, planilhas e ferramentas de comunicação (e-mail e WhatsApp);</li>
+        <li>Autoridades públicas, quando exigido por lei, ordem judicial ou solicitação regulatória;</li>
+        <li>Parceiros diretamente envolvidos na prestação do serviço contratado por você, sempre limitado ao necessário para a execução do contrato.</li>
+      </ul>
+    </section>
+
+    <section id="seguranca">
+      <h2>6. Como protegemos seus dados</h2>
+      <p>Adotamos medidas técnicas e organizacionais para proteger seus dados contra acesso não autorizado, perda, alteração ou divulgação indevida, incluindo controle de acesso restrito às informações financeiras dos clientes e boas práticas de sigilo profissional equivalentes às adotadas em serviços contábeis. Apesar dos nossos esforços, nenhum sistema é 100% imune a incidentes — caso algum ocorra, seguimos os protocolos de notificação previstos na LGPD.</p>
+    </section>
+
+    <section id="retencao">
+      <h2>7. Por quanto tempo guardamos seus dados</h2>
+      <p>Mantemos seus dados pessoais apenas pelo tempo necessário para cumprir as finalidades descritas nesta política, incluindo eventuais obrigações legais de guarda de documentos contábeis e fiscais, que podem exigir retenção por prazos superiores determinados por lei. Após esse período, os dados são eliminados ou anonimizados de forma segura.</p>
+    </section>
+
+    <section id="direitos">
+      <h2>8. Seus direitos como titular</h2>
+      <p>Conforme o artigo 18 da LGPD, você tem direito a:</p>
+      <ul>
+        <li>Confirmar a existência de tratamento dos seus dados;</li>
+        <li>Acessar seus dados;</li>
+        <li>Corrigir dados incompletos, inexatos ou desatualizados;</li>
+        <li>Solicitar anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade com a lei;</li>
+        <li>Solicitar a portabilidade dos seus dados a outro fornecedor de serviço;</li>
+        <li>Solicitar a eliminação dos dados tratados com base no seu consentimento;</li>
+        <li>Obter informações sobre com quem compartilhamos seus dados;</li>
+        <li>Revogar o consentimento a qualquer momento.</li>
+      </ul>
+      <p>Para exercer qualquer um desses direitos, entre em contato pelo canal indicado na seção 11.</p>
+    </section>
+
+    <section id="cookies">
+      <h2>9. Cookies</h2>
+      <p>Nosso site pode utilizar cookies para lembrar suas preferências (como o modo claro/escuro) e entender, de forma agregada, como os visitantes usam o site. Você pode desativar os cookies diretamente nas configurações do seu navegador, ciente de que isso pode afetar algumas funcionalidades.</p>
+    </section>
+
+    <section id="alteracoes">
+      <h2>10. Alterações desta política</h2>
+      <p>Esta Política de Privacidade pode ser atualizada periodicamente para refletir mudanças em nossas práticas ou na legislação aplicável. A versão mais recente estará sempre disponível nesta página, com a data da última atualização indicada ao final.</p>
+    </section>
+
+    <section id="contato">
+      <h2>11. Encarregado de dados (DPO) e contato</h2>
+      <p>Se você tiver dúvidas, solicitações ou reclamações sobre esta Política de Privacidade ou sobre o tratamento dos seus dados pessoais, entre em contato com nosso Encarregado de Proteção de Dados (DPO):</p>
+      <div class="contact-box">
+        <h3>Encarregado de Proteção de Dados — Osmair BPO</h3>
+        <p>Canal oficial para questões relacionadas à LGPD e à privacidade dos seus dados.</p>
+        <a href="mailto:dpo@osmairjunior.com.br">dpo@osmairjunior.com.br</a>
+      </div>
+    </section>
+
+    <p class="updated-note">Esta política está em vigor a partir de julho de 2026. Recomendamos revisitar esta página periodicamente para acompanhar eventuais atualizações.</p>
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <p>© 2026 Osmair BPO · Gestão Financeira para MPEs</p>
+    <div class="footer-links">
+      <a href="bpo.html">Site</a>
+      <a href="mailto:dpo@osmairjunior.com.br">Fale com o DPO</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
