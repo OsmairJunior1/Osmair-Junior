@@ -173,6 +173,17 @@
   .level-name{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; margin:0 0 8px; }
   .level-desc{ font-size:14px; color:var(--text-muted); line-height:1.55; max-width:340px; }
 
+  .scroll-hint{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    margin-top:22px; color:var(--teal); font-size:12px; font-weight:600;
+    animation: hintBounce 1.8s ease-in-out infinite;
+  }
+  .scroll-hint svg{ width:18px; height:18px; }
+  @keyframes hintBounce{
+    0%, 100%{ transform:translateY(0); opacity:0.6; }
+    50%{ transform:translateY(6px); opacity:1; }
+  }
+
   .section-label{ font-size:12.5px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; color:var(--navy-soft); margin:26px 0 14px; }
 
   /* radar + legend */
@@ -728,6 +739,10 @@ function renderResult(app){
       <span class="level-tag" style="color:${level.color}; background:${level.wash};">${level.tag}</span>
       <h2 class="level-name">${level.name}</h2>
       <p class="level-desc">${level.desc}</p>
+      <div class="scroll-hint">
+        <span>Role para ver seu plano de ação completo</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
     </div>
 
     <div class="section-label">Radar dos 5 pilares</div>
@@ -757,7 +772,10 @@ function renderResult(app){
     </ul>
     <div class="impact-box"><p>${play.impact}</p></div>
 
-    <button class="primary-btn" id="next-btn" style="margin-top:26px;">Ver o próximo passo</button>
+    <div style="height:76px;"></div>
+    <div class="sticky-cta-wrap">
+      <button class="primary-btn cta-pulse" id="next-btn">Ver o próximo passo</button>
+    </div>
   `;
   wrap.appendChild(div);
   div.querySelector("#radar-wrap").innerHTML = renderRadarSVG(pillarPct);
@@ -787,7 +805,6 @@ function renderOffer(app){
       <li>${ICONS.check}<span>Os principais erros que mais impedem pequenas empresas de lucrar</span></li>
       <li>${ICONS.check}<span>Como estruturar seu fluxo de caixa</span></li>
       <li>${ICONS.check}<span>Bônus: planilhas prontas para usar na sua empresa</span></li>
-      <li>${ICONS.check}<span>Gravação da aula disponível para rever quando quiser</span></li>
     </ul>
     <div class="price-box">
       <div class="price-old">De R$49,90</div>
