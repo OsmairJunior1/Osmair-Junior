@@ -103,7 +103,7 @@
   p.q-sub{ font-size:14px; color:var(--text-muted); line-height:1.55; margin:0 0 20px; }
 
   /* ---------- Options ---------- */
-  .options{ display:flex; flex-direction:column; gap:10px; margin-top:auto; }
+  .options{ display:flex; flex-direction:column; gap:10px; margin-top:28px; }
   .opt-btn{
     display:flex; align-items:center; gap:12px;
     width:100%; text-align:left; padding:16px 16px;
@@ -214,6 +214,18 @@
   .price-note{ font-size:12.5px; opacity:0.85; margin-top:8px; line-height:1.4; }
 
   .footer-note{ text-align:center; font-size:11.5px; color:#9AA6AA; margin-top:22px; }
+
+  .sticky-cta-wrap{
+    position:sticky; bottom:0; left:0; right:0;
+    padding:14px 24px calc(14px + env(safe-area-inset-bottom));
+    margin:0 -24px;
+    background:linear-gradient(0deg, var(--surface) 65%, rgba(255,255,255,0));
+  }
+  .cta-pulse{ position:relative; animation: ctaPulse 2.2s ease-in-out infinite; }
+  @keyframes ctaPulse{
+    0%, 100%{ box-shadow: 0 0 0 0 rgba(18,121,106,0.45), var(--shadow); }
+    50%{ box-shadow: 0 0 0 10px rgba(18,121,106,0), var(--shadow); }
+  }
 
   @media (max-width:340px){
     h1.q-title{ font-size:19px; }
@@ -411,7 +423,7 @@ const WHATSAPP_NUMBER = "5547996242669";
 
 /* Cole aqui a URL do seu Web App do Google Apps Script (veja o passo a passo).
    Enquanto estiver como "", os leads não são enviados a lugar nenhum. */
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwy0eDpHP6CTbx1If7dyXMixcQz1TmtOCrVzD0q5L34K3Rc0LU6IRXkj0TQyp8plRdj/exec";
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyEIJN3seA4r7vC9MfO4QUA5IsfWK-t-qioYobMiUdg_0cjW39J20DUHNyhdhQogZIg/exec";
 
 function sendLeadToSheet(payload){
   if(!GOOGLE_SHEETS_URL) return; // ainda não configurado
@@ -762,7 +774,7 @@ function renderOffer(app){
   const wrap = shell(app, { showTop:false });
   const div = document.createElement("div");
   div.className = "screen";
-  const HOTMART_LINK = "https://pay.hotmart.com/S106642023U";
+  const HOTMART_LINK = "https://pay.hotmart.com/S106642023U?checkoutMode=10";
   div.innerHTML = `
     <span class="pillar-tag" style="color:var(--teal); background:var(--teal-wash);">🔥<span>Próximo passo</span></span>
     <h1 class="q-title">Vamos entender mais a fundo o que move o seu negócio?</h1>
@@ -782,8 +794,11 @@ function renderOffer(app){
       <div class="price-new">Hoje por R$19,90</div>
       <div class="price-note">Menos que uma pizza, por uma aula ao vivo que pode transformar seu negócio.</div>
     </div>
-    <button class="primary-btn" id="cta-btn">Garantir minha vaga</button>
     <p class="footer-note">Osmair Junior · Gestão Financeira para MPEs</p>
+    <div style="height:76px;"></div>
+    <div class="sticky-cta-wrap">
+      <button class="primary-btn cta-pulse" id="cta-btn">Garantir minha vaga</button>
+    </div>
   `;
   wrap.appendChild(div);
   document.getElementById("cta-btn").onclick = () => {
