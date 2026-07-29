@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/crm/:path*", "destination": "https://crm-flax-five.vercel.app/crm/:path*" }
+  ]
+}
