@@ -817,13 +817,13 @@ function renderOffer(app){
   const wrap = shell(app, { showTop:false });
   const div = document.createElement("div");
   div.className = "screen";
-  const HOTMART_LINK = "https://pay.hotmart.com/S106642023U?checkoutMode=10";
+  const HOTMART_LINK = "https://pay.hotmart.com/S106642023U?off=00yni69u&checkoutMode=10";
   div.innerHTML = `
     <span class="pillar-tag" style="color:var(--teal); background:var(--teal-wash);">🔥<span>Próximo passo</span></span>
     <h1 class="q-title">Vamos entender mais a fundo o que move o seu negócio?</h1>
     <div class="event-box">
       <div class="icon">${ICONS.calendar}</div>
-      <p>Reunião online ao vivo<br>31/07 às 14h · individual ou em grupo</p>
+      <p>Reunião online ao vivo<br>10 de agosto às 19h · individual ou em grupo</p>
     </div>
     <p class="q-sub">Nessa reunião você vai aprender:</p>
     <ul class="offer-list">
@@ -832,14 +832,13 @@ function renderOffer(app){
       <li>${ICONS.check}<span>Bônus: planilhas prontas para usar na sua empresa</span></li>
     </ul>
     <div class="price-box">
-      <div class="price-old">De R$49,90</div>
-      <div class="price-new">Hoje por R$19,90</div>
-      <div class="price-note">Menos que uma pizza, por uma aula ao vivo que pode transformar seu negócio.</div>
+      <div class="price-new">2x de R$14,95</div>
+      <div class="price-note">ou R$29,90 à vista · menos que uma pizza, por uma aula ao vivo que pode transformar seu negócio.</div>
     </div>
     <p class="footer-note">Osmair Junior · Gestão Financeira para MPEs</p>
     <div style="height:76px;"></div>
     <div class="sticky-cta-wrap">
-      <button class="primary-btn cta-pulse" id="cta-btn">Garantir minha vaga</button>
+      <button class="primary-btn cta-pulse" id="cta-btn">Garantir minha vaga por 2x de R$14,95</button>
     </div>
   `;
   wrap.appendChild(div);
