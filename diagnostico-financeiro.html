@@ -169,6 +169,15 @@ src="https://www.facebook.com/tr?id=1598849004904152&ev=PageView&noscript=1"
   .primary-btn:hover{ transform:translateY(-2px); }
   .primary-btn:active{ transform:translateY(0) scale(0.98); }
   .primary-btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; }
+  a.primary-btn{ display:block; text-decoration:none; text-align:center; box-sizing:border-box; }
+  .primary-btn.btn-top{ margin-bottom:22px; }
+
+  .trust-row{ list-style:none; padding:0; display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:center; margin:14px 0 6px; }
+  .trust-row li{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-muted); }
+  .trust-row li svg{ flex:0 0 auto; width:14px; height:14px; color:var(--teal); }
+
+  .urgency-note{ font-size:12.5px; color:var(--text-muted); text-align:center; margin:0 0 24px; line-height:1.5; }
+  .urgency-note strong{ color:var(--navy); }
 
   /* ---------- Intro ---------- */
   .intro-screen{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:18px 0; }
@@ -302,7 +311,8 @@ const ICONS = {
   trophy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3a3 3 0 0 1-3 5M7 5H4a3 3 0 0 0 3 5"/></svg>`,
   chart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>`,
   target: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>`,
-  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg>`
 };
 
 /* ============ PILLARS ============ */
@@ -603,6 +613,7 @@ function shell(app, { showTop = true } = {}){
     top.className = "topbar";
     const back = document.createElement("button");
     back.className = "back-btn" + (state.history.length === 0 ? " hidden" : "");
+    back.setAttribute("aria-label", "Voltar");
     back.innerHTML = ICONS.back;
     back.onclick = goBack;
     top.appendChild(back);
@@ -697,7 +708,16 @@ function renderMicro(app, qid, value){
     </div>
   `;
   wrap.appendChild(div);
-  document.getElementById("continue-btn").onclick = () => proceedFromMicro(qid);
+  // Avança sozinho depois de dar tempo de ler, mas o usuário pode tocar em "Continuar" a qualquer momento pra ir mais rápido.
+  const screenAtRender = state.screen;
+  let advanced = false;
+  const advance = () => {
+    if(advanced || state.screen !== screenAtRender) return;
+    advanced = true;
+    proceedFromMicro(qid);
+  };
+  document.getElementById("continue-btn").onclick = advance;
+  setTimeout(advance, 2000);
 }
 
 function renderForm(app){
@@ -708,9 +728,9 @@ function renderForm(app){
     <span class="pillar-tag" style="color:var(--teal); background:var(--teal-wash);">${ICONS.spark}<span>Diagnóstico pronto</span></span>
     <h1 class="q-title">Seu diagnóstico está pronto!</h1>
     <p class="q-sub">Informe seus dados para liberar o resultado completo, com nota geral, radar dos 5 pilares e plano de ação.</p>
-    <div class="field"><label>Nome</label><input type="text" id="f-nome" placeholder="Seu nome"></div>
-    <div class="field"><label>E-mail</label><input type="email" id="f-email" placeholder="seuemail@exemplo.com"></div>
-    <div class="field"><label>WhatsApp</label><input type="tel" id="f-whats" placeholder="(47) 90000-0000"></div>
+    <div class="field"><label>Nome</label><input type="text" id="f-nome" placeholder="Seu nome" autocomplete="name" enterkeyhint="next"></div>
+    <div class="field"><label>E-mail</label><input type="email" id="f-email" placeholder="seuemail@exemplo.com" autocomplete="email" inputmode="email" enterkeyhint="next"></div>
+    <div class="field"><label>WhatsApp</label><input type="tel" id="f-whats" placeholder="(47) 90000-0000" autocomplete="tel" inputmode="tel" enterkeyhint="done"></div>
     <button class="primary-btn" id="submit-btn" disabled>Liberar meu diagnóstico</button>
     <p class="form-note">Seus dados são usados apenas para liberar e enviar o seu diagnóstico personalizado.</p>
   `;
@@ -727,6 +747,10 @@ function renderForm(app){
     btn.disabled = !(nome.value.trim().length > 1 && emailOk && whatsOk);
   }
   [nome, email, whats].forEach(el => el.addEventListener("input", validate));
+
+  nome.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); email.focus(); } });
+  email.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); whats.focus(); } });
+  whats.addEventListener("keydown", e => { if(e.key === "Enter" && !btn.disabled){ e.preventDefault(); btn.click(); } });
 
   btn.onclick = () => {
     state.lead = { nome: nome.value.trim(), email: email.value.trim(), whatsapp: whats.value.trim() };
@@ -834,33 +858,58 @@ function renderOffer(app){
   const div = document.createElement("div");
   div.className = "screen";
   const HOTMART_LINK = "https://pay.hotmart.com/S106642023U?off=00yni69u&checkoutMode=10";
+
+  const { pillarPct, notaGeral } = computeScores();
+  const level = levelFor(notaGeral);
+  const worst = [...pillarPct].sort((a,b) => a.pct - b.pct)[0];
+  const ctaLabel = "Garantir minha vaga por 2x de R$14,95";
+
   div.innerHTML = `
-    <span class="pillar-tag" style="color:var(--teal); background:var(--teal-wash);">🔥<span>Próximo passo</span></span>
-    <h1 class="q-title">Vamos entender mais a fundo o que move o seu negócio?</h1>
+    <span class="pillar-tag" style="color:${worst.color}; background:${worst.wash};">🔥<span>Seu ponto de maior oportunidade</span></span>
+    <h1 class="q-title">Sua nota foi ${notaGeral}/100 — vamos aprofundar em ${worst.name}</h1>
+    <p class="q-sub">Na aula ao vivo, com base no que o Raio-X Financeiro mostrou sobre a sua empresa, vamos focar exatamente no pilar onde você tem mais oportunidade de melhorar agora.</p>
+
     <div class="event-box">
       <div class="icon">${ICONS.calendar}</div>
-      <p>Reunião online ao vivo<br>24 de agosto às 19h · individual ou em grupo</p>
+      <p>Aula Ao Vivo: Os 5 Pilares da Gestão Financeira<br>1º de setembro, das 19h às 20h (horário de Brasília)</p>
     </div>
-    <p class="q-sub">Nessa reunião você vai aprender:</p>
+
+    <a href="${HOTMART_LINK}" target="_blank" rel="noopener" class="primary-btn cta-pulse btn-top">${ctaLabel}</a>
+
+    <div class="section-label">Você recebe</div>
     <ul class="offer-list">
-      <li>${ICONS.check}<span>Os principais erros que mais impedem pequenas empresas de lucrar</span></li>
-      <li>${ICONS.check}<span>Como estruturar seu fluxo de caixa</span></li>
-      <li>${ICONS.check}<span>Bônus: planilhas prontas para usar na sua empresa</span></li>
+      <li>${ICONS.check}<span>Aula ao vivo de 60 minutos, com espaço para tirar dúvidas</span></li>
+      <li>${ICONS.check}<span>Material de apoio e planilhas financeiras prontas</span></li>
+      <li>${ICONS.check}<span>Gravação da aula liberada depois, caso não consiga assistir ao vivo</span></li>
     </ul>
+
     <div class="price-box">
       <div class="price-new">2x de R$14,95</div>
-      <div class="price-note">ou R$29,90 à vista · menos que uma pizza, por uma aula ao vivo que pode transformar seu negócio.</div>
+      <div class="price-note">ou R$29,90 à vista · acesso liberado assim que o pagamento é confirmado</div>
     </div>
-    <p class="footer-note">Osmair Junior · Gestão Financeira para MPEs</p>
+
+    <p class="urgency-note">🔴 Turma reduzida, com interação ao vivo — as inscrições encerram quando as vagas forem preenchidas ou até 01/09 às 18h.</p>
+
+    <div class="section-label">Perguntas rápidas</div>
+    <ul class="action-list">
+      <li>${ICONS.check}<span><strong>A aula é ao vivo mesmo?</strong> Sim, 100% ao vivo, com a gente.</span></li>
+      <li>${ICONS.check}<span><strong>E se eu não puder assistir ao vivo?</strong> Você recebe a gravação depois, sem perder o conteúdo.</span></li>
+      <li>${ICONS.check}<span><strong>Serve para o meu tipo de negócio?</strong> Sim, os 5 pilares valem para qualquer micro ou pequena empresa.</span></li>
+    </ul>
+
+    <ul class="trust-row">
+      <li>${ICONS.shield}<span>Compra segura</span></li>
+      <li>${ICONS.wallet}<span>Pagamento via Hotmart</span></li>
+      <li>${ICONS.check}<span>Acesso imediato</span></li>
+    </ul>
+
+    <p class="footer-note">No Controle BPO · Gestão Financeira para MPEs</p>
     <div style="height:76px;"></div>
     <div class="sticky-cta-wrap">
-      <button class="primary-btn cta-pulse" id="cta-btn">Garantir minha vaga por 2x de R$14,95</button>
+      <a href="${HOTMART_LINK}" target="_blank" rel="noopener" class="primary-btn cta-pulse">${ctaLabel}</a>
     </div>
   `;
   wrap.appendChild(div);
-  document.getElementById("cta-btn").onclick = () => {
-    window.open(HOTMART_LINK, "_blank");
-  };
 }
 
 render();
