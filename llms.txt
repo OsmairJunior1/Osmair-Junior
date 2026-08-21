@@ -6,9 +6,9 @@ A No Controle BPO organiza fluxo de caixa, concilia contas bancárias, gerencia 
 
 ## Páginas
 
-- [Site institucional e planos de BPO Financeiro](https://osmairjunior.com.br/bpo.html): apresentação do serviço, diferenciais, 3 planos (Essencial, Gerencial, Estratégico) e perguntas frequentes.
-- [Raio-X Financeiro (diagnóstico gratuito)](https://osmairjunior.com.br/diagnostico-financeiro.html): quiz de 25 perguntas que avalia a saúde financeira de uma empresa em 5 pilares e gera um plano de ação.
-- [Aula ao vivo: Os 5 Pilares da Gestão Financeira](https://osmairjunior.com.br/treinamentoaovivo.html): treinamento pago pontual sobre organização financeira, caixa, rentabilidade, indicadores e planejamento.
+- [Site institucional e planos de BPO Financeiro](https://www.osmairjunior.com.br/bpo.html): apresentação do serviço, diferenciais, 3 planos (Essencial, Gerencial, Estratégico) e perguntas frequentes.
+- [Raio-X Financeiro (diagnóstico gratuito)](https://www.osmairjunior.com.br/diagnostico-financeiro.html): quiz de 25 perguntas que avalia a saúde financeira de uma empresa em 5 pilares e gera um plano de ação.
+- [Aula ao vivo: Os 5 Pilares da Gestão Financeira](https://www.osmairjunior.com.br/treinamentoaovivo.html): treinamento pago pontual sobre organização financeira, caixa, rentabilidade, indicadores e planejamento.
 
 ## Contato
 
